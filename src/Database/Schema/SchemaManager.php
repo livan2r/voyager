@@ -10,20 +10,26 @@ use TCG\Voyager\Database\Types\Type;
 abstract class SchemaManager
 {
     // todo: trim parameters
+    static $connections = [];
+
+    public static function getConnections()
+    {
+        return config('voyager.database.connections', ['mysql']);
+    }
 
     public static function __callStatic($method, $args)
     {
         return static::manager()->$method(...$args);
     }
 
-    public static function manager()
+    public static function manager($connection = null)
     {
-        return DB::connection()->getDoctrineSchemaManager();
+        return DB::connection($connection)->getDoctrineSchemaManager();
     }
 
-    public static function getDatabaseConnection()
+    public static function getDatabaseConnection($connection = null)
     {
-        return DB::connection()->getDoctrineConnection();
+        return DB::connection($connection)->getDoctrineConnection();
     }
 
     public static function tableExists($table)
@@ -32,18 +38,45 @@ abstract class SchemaManager
             $table = [$table];
         }
 
-        return static::manager()->tablesExist($table);
+        $matches = false;
+        foreach(static::getConnections() as $connection) {
+            $matches = $matches || static::manager($connection)->tablesExist($table);
+        }
+
+        // return static::tablesExist($table);
+        return $matches;
     }
 
     public static function listTables()
     {
         $tables = [];
 
-        foreach (static::manager()->listTableNames() as $tableName) {
+        foreach (static::listTableNames() as $tableName) {
             $tables[$tableName] = static::listTableDetails($tableName);
         }
 
         return $tables;
+    }
+
+    public static function listTableNames() {
+        $tableNames = [];
+        foreach(static::getConnections() as $connection) {
+            $tableNames[$connection] = static::manager($connection)->listTableNames();
+        }
+        return $tableNames;
+    }
+
+    public static function getConnectionByTableName($tableName) {
+        $tableConnection = null;
+        foreach(static::getConnections() as $connection) {
+            if (static::manager($connection)->tablesExist([$tableName])) {
+                $tableConnection = $connection;
+            }
+        }
+        if (!$connection) {
+            throw new \Exception("No acceptable connection for table $tableName");
+        }
+        return $connection;
     }
 
     /**
@@ -53,14 +86,15 @@ abstract class SchemaManager
      */
     public static function listTableDetails($tableName)
     {
-        $columns = static::manager()->listTableColumns($tableName);
+        $connection = static::getConnectionByTableName($tableName);
+        $columns = static::manager($connection)->listTableColumns($tableName);
 
         $foreignKeys = [];
-        if (static::manager()->getDatabasePlatform()->supportsForeignKeyConstraints()) {
-            $foreignKeys = static::manager()->listTableForeignKeys($tableName);
+        if (static::manager($connection)->getDatabasePlatform()->supportsForeignKeyConstraints()) {
+            $foreignKeys = static::manager($connection)->listTableForeignKeys($tableName);
         }
 
-        $indexes = static::manager()->listTableIndexes($tableName);
+        $indexes = static::manager($connection)->listTableIndexes($tableName);
 
         return new Table($tableName, $columns, $indexes, $foreignKeys, false, []);
     }
@@ -105,11 +139,12 @@ abstract class SchemaManager
 
     public static function listTableColumnNames($tableName)
     {
+        $connection = static::getConnectionByTableName($tableName);
         Type::registerCustomPlatformTypes();
 
         $columnNames = [];
 
-        foreach (static::manager()->listTableColumns($tableName) as $column) {
+        foreach (static::manager($connection)->listTableColumns($tableName) as $column) {
             $columnNames[] = $column->getName();
         }
 
