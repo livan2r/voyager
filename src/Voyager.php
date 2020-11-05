@@ -3,6 +3,8 @@
 namespace TCG\Voyager;
 
 use Arrilot\Widgets\Facade as Widget;
+use Closure;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
@@ -94,7 +96,7 @@ class Voyager
         $class = get_class($object);
 
         if (isset($this->models[Str::studly($name)]) && !$object instanceof $this->models[Str::studly($name)]) {
-            throw new \Exception("[{$class}] must be instance of [{$this->models[Str::studly($name)]}].");
+            throw new Exception("[{$class}] must be instance of [{$this->models[Str::studly($name)]}].");
         }
 
         $this->models[Str::studly($name)] = $class;
@@ -111,7 +113,7 @@ class Voyager
         return view($name, $parameters);
     }
 
-    public function onLoadingView($name, \Closure $closure)
+    public function onLoadingView($name, Closure $closure)
     {
         if (!isset($this->viewLoadingEvents[$name])) {
             $this->viewLoadingEvents[$name] = [];

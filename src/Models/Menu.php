@@ -2,8 +2,12 @@
 
 namespace TCG\Voyager\Models;
 
+use Cache;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use TCG\Voyager\Events\MenuDisplay;
 use TCG\Voyager\Facades\Voyager;
@@ -53,7 +57,7 @@ class Menu extends Model
     public static function display($menuName, $type = null, array $options = [])
     {
         // GET THE MENU - sort collection in blade
-        $menu = \Cache::remember('voyager_menu_'.$menuName, \Carbon\Carbon::now()->addDays(30), function () use ($menuName) {
+        $menu = Cache::remember('voyager_menu_'.$menuName, Carbon::now()->addDays(30), function () use ($menuName) {
             return static::where('name', '=', $menuName)
             ->with(['parent_items.children' => function ($q) {
                 $q->orderBy('order');
@@ -95,14 +99,14 @@ class Menu extends Model
             return $items;
         }
 
-        return new \Illuminate\Support\HtmlString(
-            \Illuminate\Support\Facades\View::make($type, ['items' => $items, 'options' => $options])->render()
+        return new HtmlString(
+            View::make($type, ['items' => $items, 'options' => $options])->render()
         );
     }
 
     public function removeMenuFromCache()
     {
-        \Cache::forget('voyager_menu_'.$this->name);
+        Cache::forget('voyager_menu_'.$this->name);
     }
 
     protected static function processItems($items)

@@ -3,6 +3,7 @@
 namespace TCG\Voyager;
 
 use ArrayAccess;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use JsonSerializable;
 use TCG\Voyager\Facades\Voyager as VoyagerFacade;
@@ -124,7 +125,7 @@ class Translator implements ArrayAccess, JsonSerializable
 
     protected function translateAttribute($attribute, $locale = null, $fallback = true)
     {
-        list($value, $locale, $exists) = $this->model->getTranslatedAttributeMeta($attribute, $locale, $fallback);
+        [$value, $locale, $exists] = $this->model->getTranslatedAttributeMeta($attribute, $locale, $fallback);
 
         $this->attributes[$attribute] = [
             'value'    => $value,
@@ -303,7 +304,7 @@ class Translator implements ArrayAccess, JsonSerializable
     public function __call($method, array $arguments)
     {
         if (!$this->model->hasTranslatorMethod($method)) {
-            throw new \Exception('Call to undefined method TCG\Voyager\Translator::'.$method.'()');
+            throw new Exception('Call to undefined method TCG\Voyager\Translator::'.$method.'()');
         }
 
         return call_user_func_array([$this, 'runTranslatorMethod'], [$method, $arguments]);

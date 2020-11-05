@@ -2,6 +2,7 @@
 
 namespace TCG\Voyager\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -123,7 +124,7 @@ class DataType extends Model
                         : [];
 
                     if (!$dataRow->save()) {
-                        throw new \Exception(__('voyager::database.field_safe_failed', ['field' => $field]));
+                        throw new Exception(__('voyager::database.field_safe_failed', ['field' => $field]));
                     }
 
                     // Save translations if applied
@@ -144,7 +145,7 @@ class DataType extends Model
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             if ($throw) {

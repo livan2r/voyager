@@ -3,6 +3,7 @@
 namespace TCG\Voyager\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Request;
 use TCG\Voyager\Traits\Translatable;
 
 class DataRow extends Model
@@ -58,7 +59,7 @@ class DataRow extends Model
         }
         $params['order_by'] = $this->field;
 
-        return url()->current().'?'.http_build_query(array_merge(\Request::all(), $params));
+        return url()->current().'?'.http_build_query(array_merge(Request::all(), $params));
     }
 
     public function setDetailsAttribute($value)

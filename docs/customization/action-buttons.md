@@ -53,7 +53,7 @@ Next we need to tell Voyager that we want to use this action. For this open your
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\Actions\MyAction;use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\Dispatcher;
 use TCG\Voyager\Facades\Voyager;
 
@@ -61,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        Voyager::addAction(\App\Actions\MyAction::class);
+        Voyager::addAction(MyAction::class);
     }
 }
 ```

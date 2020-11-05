@@ -2,6 +2,8 @@
 
 namespace TCG\Voyager\Traits;
 
+use Exception;
+
 trait AlertsMessages
 {
     protected $alerts = [];
@@ -51,7 +53,7 @@ trait AlertsMessages
         return $this->alert($message, 'error');
     }
 
-    protected function alertException(\Exception $e, $prefixMessage = '')
+    protected function alertException(Exception $e, $prefixMessage = '')
     {
         return $this->alertError("{$prefixMessage} ".__('voyager::generic.exception').": {$e->getMessage()}");
     }

@@ -31,7 +31,7 @@ You can override the controller for a single BREAD by creating a controller whic
 
 namespace App\Http\Controllers;
 
-class VoyagerCategoriesController extends \TCG\Voyager\Http\Controllers\VoyagerBaseController
+use TCG\Voyager\Http\Controllers\VoyagerBaseController;class VoyagerCategoriesController extends VoyagerBaseController
 {
     //...
 }
@@ -85,7 +85,7 @@ Where **name** is the class-name of the model and **object** the fully-qualified
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use App\DataRow;use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\Dispatcher;
 use TCG\Voyager\Facades\Voyager;
 
@@ -93,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        Voyager::useModel('DataRow', \App\DataRow::class);
+        Voyager::useModel('DataRow', DataRow::class);
     }
     // ...
 }

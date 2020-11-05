@@ -40,7 +40,7 @@ and a model which extends Voyagers user-model:
 
 namespace App;
 
-class Admin extends \TCG\Voyager\Models\User
+use TCG\Voyager\Models\User;class Admin extends User
 {
 
 }

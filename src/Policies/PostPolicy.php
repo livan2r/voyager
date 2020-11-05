@@ -2,6 +2,7 @@
 
 namespace TCG\Voyager\Policies;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use TCG\Voyager\Contracts\User;
 
 class PostPolicy extends BasePolicy
@@ -52,7 +53,7 @@ class PostPolicy extends BasePolicy
         $current = $user->id === $model->author_id;
 
         // Has this already been deleted?
-        $soft_delete = $model->deleted_at && in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model));
+        $soft_delete = $model->deleted_at && in_array(SoftDeletes::class, class_uses_recursive($model));
 
         return !$soft_delete && ($current || $this->checkPermission($user, $model, 'delete'));
     }

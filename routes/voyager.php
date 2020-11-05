@@ -49,9 +49,9 @@ Route::group(['as' => 'voyager.'], function () {
                 Route::post($dataType->slug.'/remove', $breadController.'@remove_media')->name($dataType->slug.'.media.remove');
                 Route::resource($dataType->slug, $breadController, ['parameters' => [$dataType->slug => 'id']]);
             }
-        } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException("Custom routes hasn't been configured because: ".$e->getMessage(), 1);
-        } catch (\Exception $e) {
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidArgumentException("Custom routes hasn't been configured because: " . $e->getMessage(), 1);
+        } catch (Exception $e) {
             // do nothing, might just be because table not yet migrated.
         }
 

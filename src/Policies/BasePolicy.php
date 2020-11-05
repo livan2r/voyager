@@ -3,6 +3,8 @@
 namespace TCG\Voyager\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use InvalidArgumentException;
 use TCG\Voyager\Contracts\User;
 use TCG\Voyager\Facades\Voyager;
 
@@ -23,7 +25,7 @@ class BasePolicy
     public function __call($name, $arguments)
     {
         if (count($arguments) < 2) {
-            throw new \InvalidArgumentException('not enough arguments');
+            throw new InvalidArgumentException('not enough arguments');
         }
         /** @var \TCG\Voyager\Contracts\User $user */
         $user = $arguments[0];
@@ -59,7 +61,7 @@ class BasePolicy
     public function delete(User $user, $model)
     {
         // Has this already been deleted?
-        $soft_delete = $model->deleted_at && in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model));
+        $soft_delete = $model->deleted_at && in_array(SoftDeletes::class, class_uses_recursive($model));
 
         return !$soft_delete && $this->checkPermission($user, $model, 'delete');
     }

@@ -3,6 +3,7 @@
 namespace TCG\Voyager\Tests;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CompassTest extends TestCase
 {
@@ -20,7 +21,7 @@ class CompassTest extends TestCase
 
     private function logString($string)
     {
-        \Illuminate\Support\Facades\Log::info($string);
+        Log::info($string);
     }
 
     public function testCantAccessCompass()
