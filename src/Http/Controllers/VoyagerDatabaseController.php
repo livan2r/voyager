@@ -32,7 +32,8 @@ class VoyagerDatabaseController extends Controller
 
         $tables = [];
         foreach (SchemaManager::listTableNames() as $connection => $connectionTables) {
-            $tables[$connection] = array_map(function ($table) use ($dataTypes, $connection) {
+            $default = env('DB_CONNECTION') === $connection;
+            $tables[$connection] = array_map(function ($table) use ($dataTypes, $connection, $default) {
                 $table = Str::replaceFirst(DB::getTablePrefix(), '', $table);
 
                 $dataType = null;
@@ -45,9 +46,9 @@ class VoyagerDatabaseController extends Controller
 
                 $table = [
                     'prefix'     => DB::getTablePrefix(),
-                    'name'       => $table,
+                    'name'       => $default ? $table : "{$connection}__$table",
                     'slug'       => $dataType['slug'] ?? null,
-                    'dataTypeId' => $dataType['id'] ?? null,
+                    'dataTypeId' => $dataType['id'] ?? null
                 ];
 
                 return (object) $table;

@@ -32,13 +32,13 @@
                             </tr>
                         @endif
                         @foreach($connectionTables as $table)
-                            @continue(in_array($table->name, config("voyager.database.tables.hidden.$connection", [])))
+                            @continue(in_array(\TCG\Voyager\Database\Schema\SchemaManager::getTableByTableName($table->name), config("voyager.database.tables.hidden.$connection", [])))
                             <tr>
                                 <td>
                                     <p class="name">
                                         <a href="{{ route('voyager.database.show', $table->prefix.$table->name) }}"
                                            data-name="{{ $table->prefix.$table->name }}" class="desctable">
-                                           {{ $table->name }}
+                                           {{ \TCG\Voyager\Database\Schema\SchemaManager::getTableByTableName($table->name) }}
                                         </a>
                                         <i class="voyager-data"
                                            style="font-size:25px; position:absolute; margin-left:10px; margin-top:-3px;"></i>

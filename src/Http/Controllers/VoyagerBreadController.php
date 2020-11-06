@@ -28,22 +28,16 @@ class VoyagerBreadController extends Controller
 
         $tables = [];
         foreach (SchemaManager::listTableNames() as $connection => $connectionTables) {
-            $tables[$connection] = array_map(function ($table) use ($dataTypes, $connection) {
+            $default = env('DB_CONNECTION') === $connection;
+            $tables[$connection] = array_map(function ($table) use ($dataTypes, $connection, $default) {
                 $table = Str::replaceFirst(DB::getTablePrefix(), '', $table);
-
-                $dataType = null;
-                if (!empty($dataTypes[$table]['model_name'])) {
-                    $model = new $dataTypes[$table]['model_name'];
-                    $dataType = $model->getConnection()->getConfig()['name'] === $connection
-                        ? $dataTypes[$table]
-                        : null;
-                }
+                $table = $default ? $table : "{$connection}__$table";
 
                 $table = [
                     'prefix'     => DB::getTablePrefix(),
                     'name'       => $table,
-                    'slug'       => $dataType['slug'] ?? null,
-                    'dataTypeId' => $dataType['id'] ?? null,
+                    'slug'       => $dataTypes[$table]['slug'] ?? null,
+                    'dataTypeId' => $dataTypes[$table]['id'] ?? null,
                 ];
 
                 return (object) $table;
@@ -57,9 +51,10 @@ class VoyagerBreadController extends Controller
      * Create BREAD.
      *
      * @param Request $request
-     * @param string  $table   Table name.
+     * @param string $table Table name.
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create(Request $request, $table)
     {

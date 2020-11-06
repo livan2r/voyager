@@ -63,27 +63,62 @@ abstract class SchemaManager
         return $tableNames;
     }
 
+    /**
+     * Return the table connection
+     *
+     * @param $tableName
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     public static function getConnectionByTableName($tableName) {
         $tableConnection = null;
+        if (strpos($tableName, '__') !== false) {
+            [$tableConnection, $tableName] = explode('__', $tableName);
+            if (static::manager($tableConnection)->tablesExist([$tableName])) {
+                return $tableConnection;
+            }
+        }
+
         foreach(static::getConnections() as $connection) {
             if (static::manager($connection)->tablesExist([$tableName])) {
                 $tableConnection = $connection;
             }
         }
-        if (!$connection) {
+
+        if (empty($tableConnection)) {
             throw new \Exception("No acceptable connection for table $tableName");
         }
-        return $connection;
+        return $tableConnection;
+    }
+
+    /**
+     * Return the table name
+     *
+     * @param $tableName
+     *
+     * @return mixed|string
+     */
+    public static function getTableByTableName($tableName) {
+        if (strpos($tableName, '__') === false) {
+            return $tableName;
+        }
+
+        [$tableConnection, $tableName] = explode('__', $tableName);
+        return $tableName;
     }
 
     /**
      * @param string $tableName
      *
      * @return \TCG\Voyager\Database\Schema\Table
+     * @throws \Doctrine\DBAL\Exception
+     * @throws \Exception
      */
     public static function listTableDetails($tableName)
     {
         $connection = static::getConnectionByTableName($tableName);
+        $tableName = static::getTableByTableName($tableName);
         $columns = static::manager($connection)->listTableColumns($tableName);
 
         $foreignKeys = [];

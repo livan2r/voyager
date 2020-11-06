@@ -34,13 +34,14 @@
                         </tr>
                     @endif
                     @foreach($connectionTables as $table)
-                        @continue(in_array($table->name, config("voyager.database.tables.hidden.$connection", [])))
+                        @php($tableName = str_replace("{$connection}_", '', $table->name))
+                        @continue(in_array($tableName, config("voyager.database.tables.hidden.$connection", [])))
                         <tr>
                             <td>
                                 <p class="name">
                                     <a href="{{ route('voyager.database.show', $table->prefix.$table->name) }}"
                                        data-name="{{ $table->prefix.$table->name }}" class="desctable">
-                                       {{ $table->name }}
+                                       {{ $tableName }}
                                     </a>
                                 </p>
                             </td>
