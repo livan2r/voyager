@@ -240,6 +240,14 @@ class VoyagerBreadController extends Controller
         return redirect()->route('voyager.bread.index')->with($data);
     }
 
+    /**
+     * Get the model scopes available
+     *
+     * @param $model_name
+     *
+     * @return \Illuminate\Support\Collection
+     * @throws \ReflectionException
+     */
     public function getModelScopes($model_name)
     {
         $reflection = new ReflectionClass($model_name);
