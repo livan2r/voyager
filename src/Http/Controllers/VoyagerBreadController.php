@@ -266,6 +266,8 @@ class VoyagerBreadController extends Controller
      * Add Relationship.
      *
      * @param Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function addRelationship(Request $request)
     {
