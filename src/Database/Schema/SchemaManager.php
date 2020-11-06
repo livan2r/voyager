@@ -9,9 +9,6 @@ use TCG\Voyager\Database\Types\Type;
 
 abstract class SchemaManager
 {
-    // todo: trim parameters
-    static $connections = [];
-
     public static function getConnections()
     {
         return config('voyager.database.connections', ['mysql']);

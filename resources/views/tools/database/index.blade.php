@@ -28,13 +28,13 @@
                 @foreach($tables as $connection => $connectionTables)
                     @if (count($tables) > 1)
                         <tr>
-                            <td colspan="2">
-                                <h3> {{ $connection }} </h3>
+                            <td colspan="3">
+                                <h3 class="center"> <b>Connection:</b> {{ $connection }} </h3>
                             </td>
                         </tr>
                     @endif
                     @foreach($connectionTables as $table)
-                        @continue(in_array($table->name, config('voyager.database.tables.hidden', [])))
+                        @continue(in_array($table->name, config("voyager.database.tables.hidden.$connection", [])))
                         <tr>
                             <td>
                                 <p class="name">
