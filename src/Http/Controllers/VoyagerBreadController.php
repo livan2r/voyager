@@ -16,6 +16,12 @@ use TCG\Voyager\Facades\Voyager;
 
 class VoyagerBreadController extends Controller
 {
+    /**
+     * Index page
+     *
+     * @return mixed
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function index()
     {
         $this->authorize('browse_bread');
@@ -56,7 +62,7 @@ class VoyagerBreadController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function create(Request $request, $table)
+    public function create(Request $request, string $table)
     {
         $this->authorize('browse_bread');
 
@@ -72,7 +78,14 @@ class VoyagerBreadController extends Controller
         return Voyager::view('voyager::tools.bread.edit-add', $data);
     }
 
-    private function prepopulateBreadInfo($table)
+    /**
+     * Get the bread default info
+     *
+     * @param string $table
+     *
+     * @return array
+     */
+    private function prepopulateBreadInfo(string $table)
     {
         $displayName = Str::singular(implode(' ', explode('_', Str::title($table))));
         $modelNamespace = config('voyager.models.namespace', app()->getNamespace());
@@ -98,6 +111,7 @@ class VoyagerBreadController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(Request $request)
     {
@@ -125,8 +139,10 @@ class VoyagerBreadController extends Controller
      * @param string $table
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Exception
      */
-    public function edit($table)
+    public function edit(string $table)
     {
         $this->authorize('browse_bread');
 
@@ -139,7 +155,8 @@ class VoyagerBreadController extends Controller
         );
 
         $isModelTranslatable = is_bread_translatable($dataType);
-        $tables = SchemaManager::listTableNames();
+        $connection = SchemaManager::getConnectionByTableName($table);
+        $tables = SchemaManager::listTableNames()[$connection];
         $dataTypeRelationships = Voyager::model('DataRow')->where('data_type_id', '=', $dataType->id)->where('type', '=', 'relationship')->get();
         $scopes = [];
         if ($dataType->model_name != '') {
@@ -153,9 +170,10 @@ class VoyagerBreadController extends Controller
      * Update BREAD.
      *
      * @param \Illuminate\Http\Request $request
-     * @param number                   $id
+     * @param number $id
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, $id)
     {
@@ -193,6 +211,7 @@ class VoyagerBreadController extends Controller
      * @param Number $id BREAD data_type id.
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($id)
     {
