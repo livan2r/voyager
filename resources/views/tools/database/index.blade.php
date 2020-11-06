@@ -29,7 +29,7 @@
                     @if (count($tables) > 1)
                         <tr>
                             <td colspan="3">
-                                <h3 class="center"> <b>Connection:</b> {{ $connection }} </h3>
+                                <h3 class="center"> Database: {{ config("database.connections.$connection.database") }} </h3>
                             </td>
                         </tr>
                     @endif

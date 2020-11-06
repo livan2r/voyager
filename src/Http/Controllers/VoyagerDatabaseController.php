@@ -24,18 +24,30 @@ class VoyagerDatabaseController extends Controller
     {
         $this->authorize('browse_database');
 
-        $dataTypes = Voyager::model('DataType')->select('id', 'name', 'slug')->get()->keyBy('name')->toArray();
+        $dataTypes = Voyager::model('DataType')
+            ->select('id', 'name', 'slug', 'model_name')
+            ->get()
+            ->keyBy('name')
+            ->toArray();
 
         $tables = [];
         foreach (SchemaManager::listTableNames() as $connection => $connectionTables) {
-            $tables[$connection] = array_map(function ($table) use ($dataTypes) {
+            $tables[$connection] = array_map(function ($table) use ($dataTypes, $connection) {
                 $table = Str::replaceFirst(DB::getTablePrefix(), '', $table);
+
+                $dataType = null;
+                if (!empty($dataTypes[$table]['model_name'])) {
+                    $model = new $dataTypes[$table]['model_name'];
+                    $dataType = $model->getConnection()->getConfig()['name'] === $connection
+                        ? $dataTypes[$table]
+                        : null;
+                }
 
                 $table = [
                     'prefix'     => DB::getTablePrefix(),
                     'name'       => $table,
-                    'slug'       => $dataTypes[$table]['slug'] ?? null,
-                    'dataTypeId' => $dataTypes[$table]['id'] ?? null,
+                    'slug'       => $dataType['slug'] ?? null,
+                    'dataTypeId' => $dataType['id'] ?? null,
                 ];
 
                 return (object) $table;
