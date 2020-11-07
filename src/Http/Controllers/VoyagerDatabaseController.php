@@ -62,6 +62,7 @@ class VoyagerDatabaseController extends Controller
      * Create database table.
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
     {
@@ -78,6 +79,7 @@ class VoyagerDatabaseController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function store(Request $request)
     {
@@ -134,6 +136,7 @@ class VoyagerDatabaseController extends Controller
      * @param string $table
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit($table)
     {
@@ -156,6 +159,7 @@ class VoyagerDatabaseController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request)
     {
@@ -254,13 +258,14 @@ class VoyagerDatabaseController extends Controller
      * @param string $table
      *
      * @return JSON
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show($table)
     {
         $this->authorize('browse_database');
 
         $additional_attributes = [];
-        $model_name = Voyager::model('DataType')->where('name', $table)->pluck('model_name')->first();
+        $model_name = Voyager::model('DataType')->where('slug', $table)->pluck('model_name')->first();
         if (isset($model_name)) {
             $model = app($model_name);
             if (isset($model->additional_attributes)) {
@@ -279,6 +284,7 @@ class VoyagerDatabaseController extends Controller
      * @param string $table
      *
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy($table)
     {
