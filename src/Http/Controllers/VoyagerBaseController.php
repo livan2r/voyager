@@ -281,6 +281,12 @@ class VoyagerBaseController extends Controller
 
         foreach ($dataType->editRows as $key => $row) {
             $dataType->editRows[$key]['col_width'] = isset($row->details->width) ? $row->details->width : 100;
+
+            // Get the related fields
+            if ($dataType->editRows[$key]->type === 'relationship' &&
+                !empty($dataType->editRows[$key]->details->fields)) {
+                $dataType->editRows[$key] = $this->getRelationFields($dataType->editRows[$key]);
+            }
         }
 
         // If a column has a relationship associated with it, we do not want to show that field
@@ -302,6 +308,27 @@ class VoyagerBaseController extends Controller
         }
 
         return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
+    }
+
+    /**
+     * Get the related fields
+     *
+     * @param $row
+     *
+     * @return mixed
+     */
+    public function getRelationFields($row)
+    {
+        $row['fields'] = Voyager::model('DataRow')
+            ->where('data_type_id', $row->details->data_type_id)
+            ->whereIn('field', $row->details->fields)
+            ->get();
+        foreach ($row['fields'] as &$field) {
+            $field['col_width'] = isset($field->details->width) ? $field->details->width : 100;
+        }
+
+
+        return $row;
     }
 
     // POST BR(E)AD
